@@ -1,23 +1,74 @@
-# use client
+# Next.js 14 가이드
 
-non-ineractive 파일은 사용자에게 주는 html이 비어있다.  
-기본적으로 react.js는 javascript 엔진을 이용하여 클라이언트에서 파일을 렌더링 한다.next.js의 모든 것은 첫 번째로 server render를 거친다.
+## Next.js 장점
 
-use client 비선언시 server component가 된다  
-use client 선언시 client component가 된다  
-server render 이후 non-interactive한 html 파일을 서버에 응답.브라우저의 react는 html을 interactive(javascript)하게 만든다. 이를 hydrate라고 부른다.  
-hydrate는 client component만 가능하다. 즉, server component는 javascript를 사용할 수 없음
+1. 🔥 서버 사이드 렌더링 (SSR)
+2. 🔥 쉽고 빠른 경로기반 라우팅
+3. 이미지 최적화
+4. CSS 및 스타일링 지원
+5. Vercel과의 통합으로 쉬운 배포
 
-client에 한번 이상의 render될 일이 없다면 사용할 필요 없다
-client component안에는 sever component를 가질 수 없다. 그 반대는 가능  
-server component는 db와 통신할 수 있다. 통신되는 민감한 코드는 client로 가지 않기 때문
+## use client와 컴포넌트 타입
 
-# layout
+### use client 선언 시
 
-next.js는 layout component로 먼저 가서 export된 default component를 렌더링 한다.
-자바의 include와 비슷하다. 헤더와 푸터 등 전역으로 고정시킬 컴포넌트들을 declare 한다.
-레이아웃은 여러개 선언이 가능하며 path위치에 따라 parent 순서가 바뀐다.
+**클라이언트 컴포넌트**: 클라이언트에서 렌더링되며, 사용자와 상호작용하는 기능을 포함할 수 있습니다.  
+**사용할 수 있는 기능**  
+-상태 관리: useState, useEffect, useContext와 같은 React 훅을 사용할 수 있음.  
+-이벤트 핸들링: 사용자 이벤트(클릭, 입력 등)를 처리할 수 있음.  
+-비동기 요청: fetch 또는 Axios 등을 통해 API 호출을 할 수 있음.  
+-React Router: 클라이언트 사이드 라우팅을 지원.  
+-하이드레이션: 서버에서 렌더링된 HTML을 클라이언트에서 JavaScript로 상호작용 가능하게 변환.  
+**사용할 수 없는 기능**  
+-서버 전용 기능: 데이터베이스 접근, 서버 사이드 로직, API 경로 처리 등은 직접 사용할 수 없음.  
+-비동기 데이터 패칭: getStaticProps, getServerSideProps 같은 Next.js의 데이터 패칭 함수 사용 불가.
 
-<Layout>
-  <YourPages />
+### use client 비선언 시
+
+**서버 컴포넌트**: 서버에서 렌더링되며, 주로 데이터베이스와 통신하는 데 사용됩니다.  
+**사용할 수 있는 기능**  
+-서버 사이드 데이터 패칭: getStaticProps, getServerSideProps를 통해 서버에서 데이터를 가져올 수 있음.  
+-서버와의 통신: 데이터베이스에 직접 접근하거나 API를 호출할 수 있음.  
+-HTML 렌더링: 클라이언트 없이 HTML을 렌더링하여 SEO와 성능 최적화에 유리.  
+-React의 Suspense 사용: 비동기 데이터 로드를 위해 Suspense를 사용할 수 있음.  
+**사용할 수 없는 기능**  
+-상태 관리 훅: useState, useEffect와 같은 클라이언트 훅을 사용할 수 없음.  
+-이벤트 핸들링: 사용자 상호작용 이벤트를 처리할 수 없음.  
+-클라이언트 전용 라이브러리: 브라우저에서만 작동하는 라이브러리(예: DOM 관련 라이브러리)를 사용할 수 없음.
+
+## 메타데이터
+
+클라이언트 컴포넌트에서는 메타데이터를 사용할 수 없습니다.
+메타데이터는 비동기 함수로 사용할 수 있습니다.
+
+## 서버 렌더링과 하이드레이션
+
+서버는 비상호작용(non-interactive) HTML 파일을 응답합니다.  
+클라이언트에서는 이 HTML을 JavaScript를 통해 상호작용(interactive)할 수 있도록 만듭니다. 이를 **하이드레이트(hydrate)**라고 합니다.  
+하이드레이트는 클라이언트 컴포넌트에서만 가능합니다. 서버 컴포넌트는 JavaScript를 사용할 수 없습니다.  
+클라이언트 컴포넌트 안에는 서버 컴포넌트를 포함할 수 없으며, 그 반대는 가능합니다.  
+서버 컴포넌트는 데이터베이스와 통신할 수 있으며, 민감한 데이터는 클라이언트로 전송되지 않습니다.
+
+## 로딩 상태
+
+로딩 상태는 주로 비동기 작업에 의해 자동 호출됩니다. 모든 작업이 완료된 후 로딩 상태는 사라집니다.  
+데이터가 준비된 후 바로 페이지에 표시되기를 원하면 **Suspense**를 사용합니다.
+
+## 레이아웃
+
+Next.js는 레이아웃 컴포넌트를 먼저 렌더링하고, 그 안에 포함된 페이지 컴포넌트를 렌더링합니다.  
+Java의 include와 유사하게, 전역으로 고정할 컴포넌트(헤더, 푸터 등)를 선언할 수 있습니다.  
+레이아웃은 여러 개 선언할 수 있으며, 경로에 따라 부모 순서가 변경됩니다.  
+<Layout>  
+ <YourPages />  
 </Layout>
+
+## 에러 핸들링
+
+에러 컴포넌트는 자동 호출됩니다. 사용할 때는 use client를 선언합니다.
+
+# 스타일 모듈
+
+스타일 모듈은 이름 충돌을 피하고 유지 관리를 개선하기 쉽습니다.
+확장자 및 이름은 ~.module.css 으로 끝나야 합니다.
+css 파일을 모듈로 임포트 한 후 다음과 같이 사용합니다. <nav className={styles.nav}>

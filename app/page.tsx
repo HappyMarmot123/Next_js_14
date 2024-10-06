@@ -1,10 +1,12 @@
-import Navigation from "../components/navigation";
+import { Suspense, useState } from "react";
+import Movie from "../components/movie";
 
-export default function hello() {
+export default async function HomePage() {
   return (
-    <div>
-      <Navigation />
-      Hello!
-    </div>
+    <>
+      <Suspense fallback={<>로딩중</>}>
+        <Movie />
+      </Suspense>
+    </>
   );
 }
